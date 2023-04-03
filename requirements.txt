@@ -8,3 +8,4 @@ mysql-client==0.0.1
 mysql-connector-python==8.0.32
 mysqlclient==2.1.1
 pyodbc==4.0.35
+ipykernel==6.19.2
