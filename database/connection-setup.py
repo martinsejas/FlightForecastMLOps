@@ -1,3 +1,12 @@
+'''
+This script gets the right database credentials from a .env file located at the root of the repository, and creates a connection object (cursor).
+
+This script was authored by Martin Sejas 
+
+'''
+
+
+
 from dotenv import load_dotenv
 import os
 import pyodbc

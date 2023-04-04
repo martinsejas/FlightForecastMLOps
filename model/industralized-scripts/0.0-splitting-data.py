@@ -1,10 +1,13 @@
 '''
-IMPORTANT PLEASE DOWNLOAD THE 'Clean_Dataset.csv' file and place it on the same folder as this script
-It can be found here: https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction
 
-This code should be run ONE TIME to split the raw data into data for training, and data for future ingestion
+IMPORTANT: Please download the 'Clean_Dataset.csv' file and place it in the same folder as this script.
+The file can be found at https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction.
 
-Feel free to change the PATH's of each destination folder on lines 41 and 42
+This script should be run only once to split the raw data into data for training and data for future ingestion.
+Feel free to change the paths of each destination folder on lines 41 and 42.
+
+This script was authored by Martin Sejas.
+
 '''
 
 
@@ -34,8 +37,8 @@ Xraw, Xprediction, yraw, yprediction = train_test_split(X, Y, random_state=42, s
 
 
 #Rejoining data sets after split
-Xraw['prices'] = yraw
-Xprediction['prices'] = yprediction
+Xraw['price'] = yraw
+Xprediction['price'] = yprediction
 
 #Converting into separate csv files
 Xraw.to_csv("./model/raw_data/flight-price-training.csv")

@@ -7,7 +7,11 @@ You can find the dataset  [here.](https://www.kaggle.com/datasets/shubhambathwal
 
 ## Important: Steps to load the dataset for this project: 
 
-For storage reasons the dataset is not uploaded into the repository. To retrieve the data please follow the following steps:
+For storage reasons the dataset is not uploaded into the repository. 
+
+Additionally the data has been split in two, half for ingestion and the other half for training.
+
+To correctly run this project please follow the following steps:
 
 <i>
 
