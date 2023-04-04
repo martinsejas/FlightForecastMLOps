@@ -88,7 +88,8 @@ ipython_config.py
 
 */data
 
-
+/airflow-data/Airflow_data.csv
+/model/raw_data/flight-price-training.csv
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
