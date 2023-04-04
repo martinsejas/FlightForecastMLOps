@@ -1,5 +1,6 @@
 '''
-This script gets the right database credentials from a .env file located at the root of the repository, and creates a connection object (cursor).
+This script gets the right database credentials from a .env file located at the root of the repository.
+It creates a connection object (cursor) to a dedicated Azure SQL database made for this project.
 
 This script was authored by Martin Sejas 
 
