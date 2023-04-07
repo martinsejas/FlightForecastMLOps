@@ -6,8 +6,6 @@ This script was authored by Martin Sejas
 
 '''
 
-
-
 from dotenv import load_dotenv
 import os
 import pyodbc
@@ -25,19 +23,24 @@ connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={u
 # Connect to the database
 connection = pyodbc.connect(connection_string)
 
+
+
 # Execute a SQL query
 cursor = connection.cursor()
 # Executing Query
-# cursor.execute('''CREATE TABLE flights(
-#             id INT PRIMARY KEY, 
-#             airline VARCHAR(255), 
-#             flightcode VARCHAR(10)
-# );''')
 
 
-cursor.execute('''
-                  SELECT * FROM flights         
-               ''')
+'''
+The cursor.commit() method in Pyodbc is used to commit any pending transactions to the database. 
+It is necessary to call this method after executing any INSERT, UPDATE, or DELETE queries 
+to ensure that changes are permanently written to the database. 
+If you don't commit the transaction, the changes will be lost when the connection to the database is closed.
+'''
+
+
+# cursor.commit()
+
+
 
 rows = cursor.fetchall()
 
