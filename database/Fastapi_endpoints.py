@@ -4,6 +4,7 @@ import pyodbc
 from fastapi import FastAPI
 import uvicorn
 import datetime
+from pydantic import BaseModel, conlist
 
 load_dotenv()
 
@@ -33,6 +34,20 @@ def read_flight():
 
     cursor.close()
     return flights
+
+# defining the flight class to be used for predictions
+class Flight(BaseModel):
+    airline: str
+    source_city: str
+    departure_time: str
+    stops: str
+    arrival_time: str
+    destination_city: str
+    class_: str 
+    duration: float
+class FlightList(BaseModel):
+    flights: conlist(Flight, min_items=1)
+
 
 # example my_features for insertion
 my_features = {"id":1,"airline":"Delta","source_city":"New York","departure_time":"Morning","stops":"one",
