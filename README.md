@@ -27,4 +27,24 @@ To correctly run this project please follow the following steps:
 5. The script will automatically split the data into ingestion data and training in their respective folders, '/airflow-data/ ' and 'model/raw_data/
 </i>
 
+<hr></hr>
 
+## Running the Streamlit App
+
+After cloning this repository. To run the Streamlit app locally follow these steps: 
+
+
+
+1. Open your terminal on the root of this repository
+
+2. Install all the packages in requirements.txt in your terminal by running the following command:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. Run the following command: 
+    ```bash
+    streamlit run frontend/Home.py
+    ```
+
+4. Copy paste the URL on your terminal into your browser
