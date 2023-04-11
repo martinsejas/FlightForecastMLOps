@@ -9,3 +9,4 @@ pyodbc==4.0.35
 ipykernel==6.19.2
 fastapi==0.95.0
 uvicorn==0.21.1
+streamlit==1.21.0
