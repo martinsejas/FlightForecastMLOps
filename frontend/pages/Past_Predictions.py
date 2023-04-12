@@ -51,5 +51,5 @@ past_predictions = st.button("Get Past Predictions :calendar:", type='primary', 
 
 if past_predictions:
     current_df = get_past_predictions(start_date=start_date, end_date=end_date)
-    current_df = current_df.drop(columns=['id'])
-    st.dataframe(current_df)
+    # current_df = current_df.drop(columns=['id'])
+    st.write(current_df)

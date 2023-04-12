@@ -49,8 +49,8 @@ def read_flight(start_date: str = Query(...), end_date: str = Query(...)):
     start_date = datetime.strptime(start_date, '%Y-%m-%d')
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM flight_predictions WHERE prediction_time >= %s AND prediction_time <= %s", (start_date, end_date,))
-    my_featuress = cursor.fetchall()
+    # cursor.execute("SELECT * FROM flight_predictions WHERE prediction_time >= %s AND prediction_time <= %s", (start_date, end_date,))
+    cursor.execute("SELECT * FROM flight_predictions")
     my_featuress = cursor.fetchall()
     flights = []
     for my_features in my_featuress:
@@ -59,6 +59,8 @@ def read_flight(start_date: str = Query(...), end_date: str = Query(...)):
             flights.append(flight)
 
     cursor.close()
+    
+    print(flights)
     return flights
 
 # example my_features for insertion
