@@ -42,7 +42,7 @@ today = datetime.datetime.today()
 start_date = st.date_input("Start date", datetime.date(2023,4,1), max_value=today)
 
 #Has to be equal or bigger start date
-end_date = st.date_input("End date",today, min_value=start_date, max_value=today)
+end_date = st.date_input("End date",today, min_value=start_date)
 
 #Filtering by prediction_source
 prediction_source = st.selectbox('Prediction source', ('Webapp', 'Scheduled', 'All'))
@@ -53,6 +53,7 @@ past_predictions = st.button("Get Past Predictions :calendar:", type='primary', 
 if past_predictions:
     current_df = get_past_predictions(start_date=start_date, end_date=end_date, prediction_source=prediction_source)
     
+    st.write(current_df)
     current_df['price'] = 42
     
     current_df['prediction_time'] = datetime.datetime.now()
@@ -64,5 +65,5 @@ if past_predictions:
     else:
         current_df['prediction_source'] = 'Scheduled'
         current_df.iloc[-4:, 10] = 'Webapp'
-    current_df = current_df.drop(columns=['id'])
-    st.write(current_df)
+    
+    # st.write(current_df)

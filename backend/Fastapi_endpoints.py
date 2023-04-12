@@ -59,33 +59,33 @@ async def read_flight(start_date: str = Query(...), end_date: str = Query(...), 
         #my_query = "SELECT * FROM flight_predictions WHERE prediction_source = ?"
 
         #values = (start_date, end_date, prediction_source)
-        values = (start_date, end_date,prediction_source)
+        sql_start_date = start_date.strftime("%Y-%m-%d %H:%M:%S")
+        sql_end_date = end_date.strftime("%Y-%m-%d %H:%M:%S")
+        values = (sql_start_date, sql_end_date,prediction_source)
+        print(values)
         cursor.execute(my_query,values)
     else:
         # my_query = f"SELECT * FROM flight_predictions WHERE prediction_time >= {start_date} AND prediction_time <= {end_date}"
-        # my_query("SELECT * FROM flight_predictions")
-        cursor.execute("SELECT * FROM flight_predictions")
+        sql_start_date = start_date.strftime("%Y-%m-%d %H:%M:%S")
+        sql_end_date = end_date.strftime("%Y-%m-%d %H:%M:%S")
+        my_query = "SELECT * FROM flight_predictions  WHERE prediction_time >= ? AND prediction_time <= ?"
+        values = (sql_start_date, sql_end_date)
+        cursor.execute(my_query, values)
     my_featuress = cursor.fetchall()
-    print(my_featuress)
+    # print(my_featuress)
     flights = []
     for my_features in my_featuress:
-            flight = {"id": my_features[0], "airline": my_features[1], "source_city": my_features[2], "departure_time": my_features[3], "stops": my_features[4],"arrival_time": my_features[5],
-                    "destination_city": my_features[6], "class": my_features[7], "duration": my_features[8], "price": my_features[9], "prediction_source": my_features[10], "prediction_time": my_features[11]}
+            flight = {"id": my_features[0], "airline": my_features[1], "flight": my_features[2], "source_city": my_features[3], "departure_time": my_features[4], "stops": my_features[5],"arrival_time": my_features[6],
+                    "destination_city": my_features[7], "class": my_features[8], "duration": my_features[9], "days_left": my_features[10], "price": my_features[11], "prediction_source": my_features[12], "prediction_time": my_features[13]}
             flights.append(flight)
-            print(my_features)
+            #print(my_features)
 
     cursor.close()
     
-    print(flights)
+    #print(flights)
     return flights
 
-# example my_features for insertion
-my_features = {"id":1,"airline":"Delta","source_city":"New York","departure_time":"Morning","stops":"one",
-               "arrival_time":"Afternoon","destination_city":"Los Angeles","class":"Business","duration":5.5,"price":500,
-               "prediction_source":"User","prediction_time":"2023-04-07T11:31:42.100000"}
 
-
- 
     
     
     
@@ -99,7 +99,7 @@ async def make_predictions(request: Request, received_my_features: List[Dict[str
 
     for index, row in received_my_features_df.iterrows():
         received_my_features = row.to_dict()
-        received_my_features["prediction_time"] = datetime.now()
+        received_my_features["prediction_time"] = (datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
         received_my_features["price"] = 42
         received_my_features["prediction_source"] = "Webapp"
         print(received_my_features)
@@ -109,7 +109,7 @@ async def make_predictions(request: Request, received_my_features: List[Dict[str
               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
         values = (received_my_features["airline"], received_my_features["flight"], received_my_features["source_city"], received_my_features["departure_time"], received_my_features["stops"],
                    received_my_features["arrival_time"], received_my_features["destination_city"], received_my_features["class_"], received_my_features["duration"], received_my_features["days_left"],
-                     received_my_features["price"], received_my_features["prediction_source"], datetime.now())
+                     received_my_features["price"], received_my_features["prediction_source"], received_my_features['prediction_time'])
         cursor.execute(query, values)
         connection.commit()
 
