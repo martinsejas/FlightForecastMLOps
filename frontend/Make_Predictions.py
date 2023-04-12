@@ -1,7 +1,38 @@
 import streamlit as st
+import requests
 import pandas as pd
+import numpy as np
+import json
 
 
+COLUMNS = ['airline', 'flight', 'source_city', 'departure_time', 'stops', 'arrival_time', 'destination_city', 'class_', 'duration', 'days_left']
+
+BASE_URL = "http://localhost:8000"
+
+PREDICTIONS_URL = BASE_URL + "/predict/"
+
+def send_prediction_request(features: pd.DataFrame)-> pd.DataFrame:
+    #converting to JSON
+    payload = features.to_dict(orient='records')
+    
+    st.write(payload)
+    
+    #Sending as a post request
+    response = requests.post(PREDICTIONS_URL, json=payload, timeout=5000)
+    
+    if response.status_code == 200:
+       #decoding (bytes) response with json.loads
+        df_content= json.loads(response.content)
+        
+        response_df = pd.DataFrame(df_content)
+        response_df['price'] = 42
+        return response_df
+    else:
+        # if the request failed, print an error message and return None
+        print(f"Error: {response.status_code} - {response.reason}")
+        return None
+    
+#------------------------------MAIN STREAMLIT APP-------------------------------------------------------------------------------
 st.title("  Predict the price of your next trip! ")
 st.subheader(" Fill in the following information, and we will estimate the price of your trip!	:airplane_departure:")
 
@@ -66,7 +97,17 @@ days_left = st.number_input('How many days left until your trip?',
                             min_value=1, max_value=260)
 
 if st.button(':ship: Get Prediction! :ship:', type='primary', use_container_width=True):
-    st.write('Predicted Flight Price: 42')
+        data = [airline,flight_code, source_city, departure_time, stops, arrival_time, destination_city, fare_class, duration, days_left]
+        
+        data_numpy = np.array(data)
+        data_numpy = data_numpy.reshape(1,-1)
+        prediction_df = pd.DataFrame(data=data_numpy, columns=COLUMNS)
+        actual_prediction = send_prediction_request(prediction_df)
+        
+        
+        st.dataframe(actual_prediction)
+        
+    
 
 st.divider()
 st.subheader("You can also upload a csv file to get many predictions!:parachute:")
@@ -82,6 +123,8 @@ feature_csv = st.file_uploader("Upload Feature CSV", type=["csv"])
 predict_many = st.button("Get Predictions :earth_americas:", type='primary', use_container_width=True, disabled=not feature_csv)
 
 if feature_csv and predict_many:
+
+    
     st.write('Predictions are: 42, 42')
     df = pd.read_csv(feature_csv)
     print(df.head())

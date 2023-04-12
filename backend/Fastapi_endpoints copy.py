@@ -1,9 +1,14 @@
 from dotenv import load_dotenv
 import os
 import pyodbc
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Query
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import pandas as pd
 import uvicorn
-import datetime
+from datetime import datetime
+from typing import List, Dict, Union
+
 
 load_dotenv()
 
@@ -19,6 +24,17 @@ connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={u
 connection = pyodbc.connect(connection_string)
 
 
+# class FlightData(BaseModel):
+#     airline: str
+#     flight: str
+#     source_city: str
+#     departure_time: str
+#     stops: int
+#     arrival_time: str
+#     destination_city: str
+#     class_: str
+#     duration: float
+#     days_left: int
 
 
 # the 'past_predictions' endpoint for fetching past predictions from the database
@@ -28,9 +44,13 @@ app = FastAPI()
 
 
 @app.get("/past_predictions/")
-def read_flight():
+def read_flight(start_date: str = Query(...), end_date: str = Query(...)):
+    
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM flight_predictions")
+    cursor.execute("SELECT * FROM flight_predictions WHERE prediction_time >= %s AND prediction_time <= %s", (start_date, end_date,))
+    my_featuress = cursor.fetchall()
     my_featuress = cursor.fetchall()
     flights = []
     for my_features in my_featuress:
@@ -47,20 +67,28 @@ my_features = {"id":1,"airline":"Delta","source_city":"New York","departure_time
                "prediction_source":"User","prediction_time":"2023-04-07T11:31:42.100000"}
 
 # the 'predict' endpoint for predictions and feature/prediction storage in the database
-@app.get("/predict/")
-def make_predictions(my_features):
-    cursor = connection.cursor()
-    my_features["prediction_time"] = datetime.datetime.now()
-    query = ("INSERT INTO flight_predictions (airline, source_city, departure_time, stops, arrival_time, destination_city, class, duration, price, prediction_source, prediction_time)"
-          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-    values = (my_features["airline"], my_features["source_city"], my_features["departure_time"], my_features["stops"],
-               my_features["arrival_time"], my_features["destination_city"], my_features["class"], my_features["duration"],
-                 my_features["price"], my_features["prediction_source"], my_features["prediction_time"])
-    cursor.execute(query, values)
-    connection.commit()
-    cursor.close()
+@app.post("/predict/")
+async def make_predictions(request: Request, received_my_features: List[Dict[str, Union[str, int, float]]]):
+    print(received_my_features)
+    
+    received_my_features_df = pd.DataFrame(received_my_features)
+    
+    received_my_features_df["prediction_time"] = datetime.now()
+    print(received_my_features_df.head())
+    # cursor = connection.cursor()
+    # my_features["prediction_time"] = datetime.datetime.now()
+    # query = ("INSERT INTO flight_predictions (airline, source_city, departure_time, stops, arrival_time, destination_city, class, duration, price, prediction_source, prediction_time)"
+    #       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+    # values = (my_features["airline"], my_features["source_city"], my_features["departure_time"], my_features["stops"],
+    #            my_features["arrival_time"], my_features["destination_city"], my_features["class"], my_features["duration"],
+    #              my_features["price"], my_features["prediction_source"], my_features["prediction_time"])
+    # cursor.execute(query, values)
+    # connection.commit()
+    # cursor.close()
 
-    return 42
+    # return 42
+    
+    return received_my_features_df.to_dict()
      
 
 if __name__ == "__main__":
