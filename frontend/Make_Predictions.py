@@ -15,7 +15,6 @@ def send_prediction_request(features: pd.DataFrame)-> pd.DataFrame:
     #converting to JSON
     payload = features.to_dict(orient='records')
     
-    st.write(payload)
     
     #Sending as a post request
     response = requests.post(PREDICTIONS_URL, json=payload, timeout=5000)
@@ -104,7 +103,7 @@ if st.button(':ship: Get Prediction! :ship:', type='primary', use_container_widt
         prediction_df = pd.DataFrame(data=data_numpy, columns=COLUMNS)
         actual_prediction = send_prediction_request(prediction_df)
         
-        
+        st.write("Your prediction is: 42")
         st.dataframe(actual_prediction)
         
     
@@ -125,9 +124,10 @@ predict_many = st.button("Get Predictions :earth_americas:", type='primary', use
 if feature_csv and predict_many:
 
     
-    st.write('Predictions are: 42, 42')
-    df = pd.read_csv(feature_csv)
+    df = pd.read_csv(feature_csv, names=COLUMNS, header=None)
     print(df.head())
+    predictions = send_prediction_request(df)
+    st.dataframe(predictions)
     
 else:
     st.caption("Please upload file before requesting predictions.")

@@ -39,6 +39,7 @@ If you don't commit the transaction, the changes will be lost when the connectio
 
 
 # cursor.commit()
+cursor.execute("SELECt * FROM flight_predictions")
 
 
 
