@@ -7,7 +7,7 @@ st.title("  Predict the price of your next trip! ")
 st.subheader(" Fill in the following information, and we will estimate the price of your trip!	:airplane_departure:")
 
 
-airline = st.selectbox('What Airline do you want to fly with?', 
+airline = st.selectbox('What Airline are you flying with?', 
                        ('Air India', 'GO FIRST', 'Indigo', 'Vistara', 'AirAsia', 'SpiceJet'))
 
 if(airline == 'Air India'):
@@ -15,6 +15,8 @@ if(airline == 'Air India'):
     
 if(airline == 'GO FIRST'):
     airline = 'GO_FIRST'
+    
+flight_code = st.text_input(label='Flight Number (if not known leave blank)', value='AA-0000', max_chars=7)
 
 source_city = st.radio('What is your origin city?',
                        ('Bangalore', 'Hyderabad', 'Kolkata', 'Mumbai', 'Delhi', 'Chennai'))
@@ -58,7 +60,7 @@ duration = st.number_input('What is the total duration of your flight(s)? (hours
                            min_value=0.5, max_value=50.0)
 
 days_left = st.number_input('How many days left until your trip?',
-                            min_value=1, max_value=49)
+                            min_value=1, max_value=50)
 
 if st.button(':ship: Get Prediction! :ship:', type='primary', use_container_width=True):
     st.write('Predicted Flight Price: 42')
@@ -83,12 +85,11 @@ predict_many = st.button("Get Predictions :earth_americas:", type='primary', use
 
 if feature_csv and predict_many:
     st.write('Predictions are: 42, 42')
-    print(type(predict_many))
     df = pd.read_csv(feature_csv)
     print(df.head())
     
 else:
-    st.caption("Please upload file before requesting predictions!")
+    st.caption("Please upload file before requesting predictions.")
     
     
     
