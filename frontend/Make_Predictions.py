@@ -6,6 +6,7 @@ import json
 
 
 COLUMNS = ['airline', 'flight', 'source_city', 'departure_time', 'stops', 'arrival_time', 'destination_city', 'class_', 'duration', 'days_left']
+COLUMNS_csv = ['airline', 'flight', 'source_city', 'departure_time', 'stops', 'arrival_time', 'destination_city', 'class_', 'duration', 'days_left','price']
 
 BASE_URL = "http://localhost:8000"
 
@@ -124,8 +125,8 @@ predict_many = st.button("Get Predictions :earth_americas:", type='primary', use
 if feature_csv and predict_many:
 
     
-    df = pd.read_csv(feature_csv, names=COLUMNS, header=None)
-    print(df.head())
+    df = pd.read_csv(feature_csv, names=COLUMNS_csv, header=None)
+    df = df.drop(columns=['price'])
     predictions = send_prediction_request(df)
     st.dataframe(predictions)
     

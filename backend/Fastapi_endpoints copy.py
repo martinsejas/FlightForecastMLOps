@@ -107,28 +107,68 @@ my_features = {"id":1,"airline":"Delta","source_city":"New York","departure_time
                "prediction_source":"User","prediction_time":"2023-04-07T11:31:42.100000"}
 
 # the 'predict' endpoint for predictions and feature/prediction storage in the database
+# @app.post("/predict/")
+# async def make_predictions(request: Request, received_my_features: List[Dict[str, Union[str, int, float]]]):
+#     print(received_my_features)
+    
+#     received_my_features_df = pd.DataFrame(received_my_features)
+    
+#     received_my_features_df["prediction_time"] = datetime.now()
+#     received_my_features_df["price"] = 42
+#     received_my_features_df["prediction_source"] = "Webapp"
+#     cursor = connection.cursor()
+#     received_my_features = received_my_features_df.to_dict(orient='list')
+#     received_my_features = flatten_dict(received_my_features)
+#     query = ("INSERT INTO flight_predictions (airline,flight, source_city, departure_time, stops, arrival_time, destination_city, class, duration, days_left, price, prediction_source, prediction_time)"
+#           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
+#     values = (received_my_features["airline"], received_my_features["flight"], received_my_features["source_city"], received_my_features["departure_time"], received_my_features["stops"],
+#                received_my_features["arrival_time"], received_my_features["destination_city"], received_my_features["class_"], received_my_features["duration"], received_my_features["days_left"],
+#                  received_my_features["price"], received_my_features["prediction_source"], received_my_features["prediction_time"])
+#     cursor.execute(query, values)
+#     connection.commit()
+#     cursor.close()
+
+    # return 42
+    
+    # return received_my_features_df.to_dict()
+    
+    
+    
 @app.post("/predict/")
 async def make_predictions(request: Request, received_my_features: List[Dict[str, Union[str, int, float]]]):
     print(received_my_features)
-    
+
     received_my_features_df = pd.DataFrame(received_my_features)
-    
-    received_my_features_df["prediction_time"] = datetime.now()
-    received_my_features_df["price"] = 42
-    received_my_features_df["prediction_source"] = "Webapp"
+
+    # received_my_features_df["prediction_time"] = datetime.now()
+    # received_my_features_df["price"] = 42
+    # received_my_features_df["prediction_source"] = "Webapp"
     cursor = connection.cursor()
-    received_my_features = received_my_features_df.to_dict(orient='list')
-    received_my_features = flatten_dict(received_my_features)
-    query = ("INSERT INTO flight_predictions (airline,flight, source_city, departure_time, stops, arrival_time, destination_city, class, duration, days_left, price, prediction_source, prediction_time)"
-          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
-    values = (received_my_features["airline"], received_my_features["flight"], received_my_features["source_city"], received_my_features["departure_time"], received_my_features["stops"],
-               received_my_features["arrival_time"], received_my_features["destination_city"], received_my_features["class_"], received_my_features["duration"], received_my_features["days_left"],
-                 received_my_features["price"], received_my_features["prediction_source"], received_my_features["prediction_time"])
-    cursor.execute(query, values)
-    connection.commit()
+
+    for index, row in received_my_features_df.iterrows():
+        received_my_features = row.to_dict()
+        received_my_features["prediction_time"] = datetime.now()
+        received_my_features["price"] = 42
+        received_my_features["prediction_source"] = "Webapp"
+        print(received_my_features)
+        if(index == 1):
+            with open('output.txt', 'w') as f:
+                # Write the string to the file
+                f.write('This is a test string.')
+
+                # Close the file
+                f.close()
+        # received_my_features = flatten_dict(received_my_features)
+        query = ("INSERT INTO flight_predictions (airline,flight, source_city, departure_time, stops, arrival_time, destination_city, class, duration, days_left, price, prediction_source, prediction_time)"
+              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
+        values = (received_my_features["airline"], received_my_features["flight"], received_my_features["source_city"], received_my_features["departure_time"], received_my_features["stops"],
+                   received_my_features["arrival_time"], received_my_features["destination_city"], received_my_features["class_"], received_my_features["duration"], received_my_features["days_left"],
+                     received_my_features["price"], received_my_features["prediction_source"], datetime.now())
+        cursor.execute(query, values)
+        connection.commit()
+
     cursor.close()
 
-    # return 42
     
     return received_my_features_df.to_dict()
    
