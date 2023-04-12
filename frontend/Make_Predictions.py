@@ -1,18 +1,22 @@
 import streamlit as st
+import pandas as pd
+
 
 st.title("  Predict the price of your next trip! ")
-
 st.subheader(" Fill in the following information, and we will estimate the price of your trip!	:airplane_departure:")
 
-
-airline = st.selectbox('What Airline do you want to fly with?', 
+#Setting form for feature collection
+airline = st.selectbox('What Airline are you flying with?', 
                        ('Air India', 'GO FIRST', 'Indigo', 'Vistara', 'AirAsia', 'SpiceJet'))
 
+#Resetting values for back end purposes
 if(airline == 'Air India'):
     airline = 'Air_India'
     
 if(airline == 'GO FIRST'):
     airline = 'GO_FIRST'
+    
+flight_code = st.text_input(label='Flight Number (if not known leave default)', value='AA-0000', max_chars=7)
 
 source_city = st.radio('What is your origin city?',
                        ('Bangalore', 'Hyderabad', 'Kolkata', 'Mumbai', 'Delhi', 'Chennai'))
@@ -20,6 +24,7 @@ source_city = st.radio('What is your origin city?',
 departure_time = st.selectbox('What time are you planning to depart?', 
                        ('Early Morning', 'Morning', 'Afternoon', 'Night', 'Late Night'))
 
+#Resetting values for back end purposes
 if(departure_time == 'Early Morning'):
     departure_time = 'Early_Morning'
     
@@ -28,7 +33,7 @@ if(departure_time == 'Late Night'):
 
 stops = st.select_slider(' How many connections are you making?',
                          ('0', '1', '2+'))
-
+#Resetting for back end
 if(stops == '0'):
     stops = 'zero'
 elif(stops == '1'):
@@ -40,6 +45,7 @@ else:
 arrival_time = st.selectbox('What time are you planning to arrive?', 
                        ('Early Morning', 'Morning', 'Afternoon', 'Night', 'Late Night'))
 
+#Resetting for back end
 if(arrival_time == 'Early Morning'):
     arrival_time = 'Early_Morning'
     
@@ -52,12 +58,37 @@ destination_city = st.radio('Where are you flying to?',
 fare_class = st.radio('What class is your ticket?',
                       ('Economy', 'Business'))
 
+#Max values are from dataset
 duration = st.number_input('What is the total duration of your flight(s)? (hours)',
                            min_value=0.5, max_value=50.0)
 
 days_left = st.number_input('How many days left until your trip?',
-                            min_value=1, max_value=49)
+                            min_value=1, max_value=260)
 
 if st.button(':ship: Get Prediction! :ship:', type='primary', use_container_width=True):
     st.write('Predicted Flight Price: 42')
 
+st.divider()
+st.subheader("You can also upload a csv file to get many predictions!:parachute:")
+
+st.caption("Note: we only accept csv files with feature values in the right order")
+
+
+#Accept csv's only
+feature_csv = st.file_uploader("Upload Feature CSV", type=["csv"])
+
+
+#Adding some logic where they can't request predictions without the file being uploaded
+predict_many = st.button("Get Predictions :earth_americas:", type='primary', use_container_width=True, disabled=not feature_csv)
+
+if feature_csv and predict_many:
+    st.write('Predictions are: 42, 42')
+    df = pd.read_csv(feature_csv)
+    print(df.head())
+    
+else:
+    st.caption("Please upload file before requesting predictions.")
+    
+    
+    
+    

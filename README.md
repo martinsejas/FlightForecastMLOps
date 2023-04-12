@@ -44,7 +44,7 @@ After cloning this repository. To run the Streamlit app locally follow these ste
 
 3. Run the following command: 
     ```bash
-    streamlit run frontend/Home.py
+    streamlit run frontend/Make_Predictions.py
     ```
 
 4. Copy paste the URL on your terminal into your browser
