@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+
 
 st.title("  Predict the price of your next trip! ")
 
@@ -61,3 +63,33 @@ days_left = st.number_input('How many days left until your trip?',
 if st.button(':ship: Get Prediction! :ship:', type='primary', use_container_width=True):
     st.write('Predicted Flight Price: 42')
 
+st.markdown("""
+           
+           
+           
+            
+            
+            """)
+st.subheader("You can also upload a csv file to get many predictions!:parachute:")
+
+st.caption("Note: we only accept csv files with feature values in the right order")
+
+
+feature_csv = st.file_uploader("Upload Feature CSV", type=["csv"])
+
+
+
+predict_many = st.button("Get Predictions :earth_americas:", type='primary', use_container_width=True, disabled=not feature_csv)
+
+if feature_csv and predict_many:
+    st.write('Predictions are: 42, 42')
+    print(type(predict_many))
+    df = pd.read_csv(feature_csv)
+    print(df.head())
+    
+else:
+    st.caption("Please upload file before requesting predictions!")
+    
+    
+    
+    
