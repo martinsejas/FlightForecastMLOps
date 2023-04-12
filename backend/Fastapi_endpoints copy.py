@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
 import os
 import pyodbc
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import uvicorn
-import datetime
+from datetime import datetime
 
 load_dotenv()
 
@@ -28,9 +28,13 @@ app = FastAPI()
 
 
 @app.get("/past_predictions/")
-def read_flight():
+def read_flight(start_date: str = Query(...), end_date: str = Query(...)):
+    
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM flight_predictions")
+    cursor.execute("SELECT * FROM flight_predictions WHERE prediction_time >= %s AND prediction_time <= %s", (start_date, end_date,))
+    my_featuress = cursor.fetchall()
     my_featuress = cursor.fetchall()
     flights = []
     for my_features in my_featuress:
