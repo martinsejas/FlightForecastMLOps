@@ -12,16 +12,8 @@ from typing import List, Dict, Union
 
 load_dotenv()
 
-#Helper function to flatten dict for parsing
-def flatten_dict(d):
-    result = {}
-    for key, value in d.items():
-        if isinstance(value, dict):
-            flattened = flatten_dict(value)
-            result.update({f"{key}.{k}": v for k, v in flattened.items()})
-        else:
-            result[key] = value[0]  # assuming all values are lists with a single element
-    return result
+
+
 
 # Set up the connection string
 server = os.getenv("HOST")
@@ -34,7 +26,8 @@ connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={u
 # Connect to the database
 connection = pyodbc.connect(connection_string)
 
-
+#TODO make connection class (TRY) [SINGLETON DESIGN PATTERN
+#https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python 
 
 
 
@@ -52,6 +45,13 @@ async def read_flight(start_date: str = Query(...), end_date: str = Query(...), 
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     cursor = connection.cursor()
     
+    #TODO extract sql_start_date, sql_end_start
+    
+    #TODO extract datetime formatting as a constant "%Y-%m-%d %H:%M:%S"
+    
+    #TODO stick to a quotation style 
+    
+    #TODO refactor by adding 'IN' SQL query
     print(prediction_source)
     if(prediction_source != 'All'):
         
@@ -86,16 +86,18 @@ async def read_flight(start_date: str = Query(...), end_date: str = Query(...), 
     return flights
 
 
-    
+# TODO add basemodel
     
     
 @app.post("/predict/")
-async def make_predictions(request: Request, received_my_features: List[Dict[str, Union[str, int, float]]]):
+async def make_predictions(received_my_features: List[Dict[str, Union[str, int, float]]]):
     print(received_my_features)
 
     received_my_features_df = pd.DataFrame(received_my_features)
 
     cursor = connection.cursor()
+    
+    #TODO: Remove for loop
 
     for index, row in received_my_features_df.iterrows():
         received_my_features = row.to_dict()
