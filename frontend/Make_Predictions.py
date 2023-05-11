@@ -12,13 +12,20 @@ BASE_URL = "http://localhost:8000"
 
 PREDICTIONS_URL = BASE_URL + "/predict/"
 
+HEADERS = {'Content-type': 'application/json'}
+
 def send_prediction_request(features: pd.DataFrame)-> pd.DataFrame:
     #converting to dictionary
     payload = features.to_dict(orient='records')
+    print(payload)
+    
+    payload= { "data": payload}
+    
+    print(json.dumps(payload))
    
     
     #Sending as a post request
-    response = requests.post(PREDICTIONS_URL, json=payload[0], timeout=5000)
+    response = requests.post(PREDICTIONS_URL, json=payload, timeout=5000, headers=HEADERS)
     
     if response.status_code == 200:
        #decoding (bytes) response with json.loads

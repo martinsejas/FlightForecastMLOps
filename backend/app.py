@@ -54,8 +54,8 @@ async def read_flight(start_date: str = Query(...), end_date: str = Query(...), 
 
     return flights
 
-
-class FlightFeatures(BaseModel):
+#Setting basemodels for API     
+class Flight(BaseModel):
     airline: str
     flight: str
     source_city: str
@@ -66,17 +66,28 @@ class FlightFeatures(BaseModel):
     class_: str
     duration: float
     days_left: int
+
+    class Config:
+        orm_mode = True
+
+class Flights(BaseModel):
+    data: List[Flight]
+
+    class Config:
+        orm_mode = True
     
     
 @app.post("/predict/")
-async def make_predictions(received_my_features: FlightFeatures = Body(...)):
-
-    received_my_features_df = pd.DataFrame([received_my_features.dict()])
+async def make_predictions(received_my_features: Flights):
     
-    print(received_my_features_df)
-
+    
+    flights_dict = received_my_features.dict()
+    flights_data = flights_dict['data']
+    received_my_features_df = pd.json_normalize(flights_data)
     
     #TODO: Remove for loop
+    
+    print(received_my_features_df.head())
 
     for index, row in received_my_features_df.iterrows():
         received_my_features = row.to_dict()
@@ -85,7 +96,6 @@ async def make_predictions(received_my_features: FlightFeatures = Body(...)):
         received_my_features["prediction_source"] = "Webapp"
         print(received_my_features)
 
-        # received_my_features = flatten_dict(received_my_features)
         query = ("INSERT INTO flight_predictions (airline,flight, source_city, departure_time, stops, arrival_time, destination_city, class, duration, days_left, price, prediction_source, prediction_time)"
               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
         values = (received_my_features["airline"], received_my_features["flight"], received_my_features["source_city"], received_my_features["departure_time"], received_my_features["stops"],

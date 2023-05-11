@@ -48,3 +48,8 @@ After cloning this repository. To run the Streamlit app locally follow these ste
     ```
 
 4. Copy paste the URL on your terminal into your browser
+
+5. RUN FOR API
+
+```bash
+uvicorn Fastapi_endpoints_copy:app --port 5000
