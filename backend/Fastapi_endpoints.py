@@ -1,33 +1,12 @@
-from dotenv import load_dotenv
-import os
-import pyodbc
-from fastapi import FastAPI, Request, Query
+from fastapi import FastAPI, Request, Query, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import pandas as pd
 import uvicorn
 from datetime import datetime
 from typing import List, Dict, Union
+from DatabaseConnection import DatabaseConnection
 
-
-load_dotenv()
-
-
-
-
-# Set up the connection string
-server = os.getenv("HOST")
-database = os.getenv("DATABASE")
-username = os.getenv("DBUSERNAME")
-password = os.getenv("PASSWORD")
-driver= '{ODBC Driver 18 for SQL Server}'
-connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-
-# Connect to the database
-connection = pyodbc.connect(connection_string)
-
-#TODO make connection class (TRY) [SINGLETON DESIGN PATTERN
-#https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python 
 
 
 
@@ -36,94 +15,108 @@ app = FastAPI()
 
 #on startup load model and persistent objects
 
+#setting main database object
+database = DatabaseConnection()
 
+TABLE_NAME = "flight_predictions"
+
+
+# format for timestamp
+TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 @app.get("/past_predictions/")
 async def read_flight(start_date: str = Query(...), end_date: str = Query(...), prediction_source: str = Query(...)):
     
+    #Reformat input parameters
     start_date = datetime.strptime(start_date, '%Y-%m-%d')
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
-    cursor = connection.cursor()
-    
-    #TODO extract sql_start_date, sql_end_start
-    
-    #TODO extract datetime formatting as a constant "%Y-%m-%d %H:%M:%S"
-    
-    #TODO stick to a quotation style 
-    
-    #TODO refactor by adding 'IN' SQL query
-    print(prediction_source)
-    if(prediction_source != 'All'):
-        
-        my_query = "SELECT * FROM flight_predictions WHERE prediction_time >= ? AND prediction_time <= ? AND prediction_source = ?"
-        #my_query = "SELECT * FROM flight_predictions WHERE prediction_source = ?"
-
-        #values = (start_date, end_date, prediction_source)
-        sql_start_date = start_date.strftime("%Y-%m-%d %H:%M:%S")
-        sql_end_date = end_date.strftime("%Y-%m-%d %H:%M:%S")
-        values = (sql_start_date, sql_end_date,prediction_source)
-        print(values)
-        cursor.execute(my_query,values)
+     
+    #Setting it on the right format
+    sql_start_date = datetime.strftime(start_date, TIMESTAMP_FORMAT)
+    sql_end_date = datetime.strftime(end_date,TIMESTAMP_FORMAT)
+   
+    #Setting right prediction source
+    if prediction_source == 'All':
+        prediction_source = "'Webapp','Scheduled'"
     else:
-        # my_query = f"SELECT * FROM flight_predictions WHERE prediction_time >= {start_date} AND prediction_time <= {end_date}"
-        sql_start_date = start_date.strftime("%Y-%m-%d %H:%M:%S")
-        sql_end_date = end_date.strftime("%Y-%m-%d %H:%M:%S")
-        my_query = "SELECT * FROM flight_predictions  WHERE prediction_time >= ? AND prediction_time <= ?"
-        values = (sql_start_date, sql_end_date)
-        cursor.execute(my_query, values)
-    my_featuress = cursor.fetchall()
-    # print(my_featuress)
-    flights = []
-    for my_features in my_featuress:
-            flight = {"id": my_features[0], "airline": my_features[1], "flight": my_features[2], "source_city": my_features[3], "departure_time": my_features[4], "stops": my_features[5],"arrival_time": my_features[6],
-                    "destination_city": my_features[7], "class": my_features[8], "duration": my_features[9], "days_left": my_features[10], "price": my_features[11], "prediction_source": my_features[12], "prediction_time": my_features[13]}
-            flights.append(flight)
-            #print(my_features)
+        prediction_source = f"'{prediction_source}'"
+        
+        
+    my_query = f"SELECT * FROM flight_predictions WHERE prediction_time >= ? AND prediction_time <= ? AND prediction_source IN ({prediction_source})"
+    values = (sql_start_date, sql_end_date)
+    database.cursor.execute(my_query, values)
+ 
+    rows = database.cursor.fetchall()
 
-    cursor.close()
-    
-    #print(flights)
+    flights = []
+    for row in rows:
+            flight = {"id": row[0], "airline": row[1], "flight": row[2], "source_city": row[3], "departure_time": row[4], "stops": row[5],"arrival_time": row[6],
+                    "destination_city": row[7], "class": row[8], "duration": row[9], "days_left": row[10], "price": row[11], "prediction_source": row[12], "prediction_time": row[13]}
+            flights.append(flight)
+
     return flights
 
+#Setting basemodels for API     
+class Flight(BaseModel):
+    airline: str
+    flight: str
+    source_city: str
+    departure_time: str
+    stops: str
+    arrival_time: str
+    destination_city: str
+    class_: str
+    duration: float
+    days_left: int
 
-# TODO add basemodel
+    class Config:
+        orm_mode = True
+
+class Flights(BaseModel):
+    data: List[Flight]
+
+    class Config:
+        orm_mode = True
+        
+
+    
+""" 
+INSERT INTO MyTable
+  ( Column1, Column2, Column3 )
+    VALUES
+  ('John', 123, 'Lloyds Office'), 
+  ('Jane', 124, 'Lloyds Office'), 
+  ('Billy', 125, 'London Office'),
+  ('Miranda', 126, 'Bristol Office');
+""" 
     
     
 @app.post("/predict/")
-async def make_predictions(received_my_features: List[Dict[str, Union[str, int, float]]]):
-    print(received_my_features)
-
-    received_my_features_df = pd.DataFrame(received_my_features)
-
-    cursor = connection.cursor()
+async def make_predictions(received_my_features: Flights):
     
-    #TODO: Remove for loop
+    
+    flights_dict = received_my_features.dict()
+    flights_data = flights_dict['data']
+    received_my_features_df = pd.json_normalize(flights_data)
+    
 
-    for index, row in received_my_features_df.iterrows():
-        received_my_features = row.to_dict()
-        received_my_features["prediction_time"] = (datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
-        received_my_features["price"] = 42
-        received_my_features["prediction_source"] = "Webapp"
-        print(received_my_features)
+    received_my_features_df["price"] = 42
+    received_my_features_df["prediction_source"] = "Webapp"
+    received_my_features_df["prediction_time"] = (datetime.now()).strftime(TIMESTAMP_FORMAT)
+ 
+    
+    values = received_my_features_df.values.tolist()
 
-        # received_my_features = flatten_dict(received_my_features)
-        query = ("INSERT INTO flight_predictions (airline,flight, source_city, departure_time, stops, arrival_time, destination_city, class, duration, days_left, price, prediction_source, prediction_time)"
-              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
-        values = (received_my_features["airline"], received_my_features["flight"], received_my_features["source_city"], received_my_features["departure_time"], received_my_features["stops"],
-                   received_my_features["arrival_time"], received_my_features["destination_city"], received_my_features["class_"], received_my_features["duration"], received_my_features["days_left"],
-                     received_my_features["price"], received_my_features["prediction_source"], received_my_features['prediction_time'])
-        cursor.execute(query, values)
-        connection.commit()
 
-    cursor.close()
+    query = ("INSERT INTO flight_predictions (airline,flight, source_city, departure_time, stops, arrival_time, destination_city, class, duration, days_left, price, prediction_source, prediction_time)"
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)")
 
+    database.cursor.executemany(query, values)
+    database.connection.commit()
     
     return received_my_features_df.to_dict()
    
      
 
 if __name__ == "__main__":
-    #flights = read_flight()
-    #for flight in flights:
-    #     print(flight)
     uvicorn.run(app, host="localhost", port=8000)
