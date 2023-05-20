@@ -24,6 +24,9 @@ TABLE_NAME = "flight_predictions"
 # format for timestamp
 TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+
+#Get past predictions
+
 @app.get("/past_predictions/")
 async def read_flight(start_date: str = Query(...), end_date: str = Query(...), prediction_source: str = Query(...)):
     
@@ -80,16 +83,7 @@ class Flights(BaseModel):
         
 
     
-""" 
-INSERT INTO MyTable
-  ( Column1, Column2, Column3 )
-    VALUES
-  ('John', 123, 'Lloyds Office'), 
-  ('Jane', 124, 'Lloyds Office'), 
-  ('Billy', 125, 'London Office'),
-  ('Miranda', 126, 'Bristol Office');
-""" 
-    
+
     
 @app.post("/predict/")
 async def make_predictions(received_my_features: Flights):
