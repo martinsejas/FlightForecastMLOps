@@ -4,6 +4,7 @@ import joblib
 
 FOLDER_PATH = "backend/persisted_models/"
 
+#Encoding
 def encode_stops(s:str)-> int:
     if (s == 'one'):
         return 1
@@ -28,12 +29,17 @@ def get_predictions(df: pd.DataFrame)-> np.array:
     
     df = process_stops_column(df=df)
     
+    df["class"] = df["class_"]
+    
     #drop unnecessary columns
-    df = df.drop(columns=['flight'])
+    df = df.drop(columns=['flight',"class_"])
+    
+    print(df.head())
     
     # pre_processing raw data
     pre_processor = joblib.load(filename=FOLDER_PATH+"pre_processor_features.joblib")
     processed_data = pre_processor.transform(df)
+    
     
     #Applying polynomial transformation
     feature_transformer = joblib.load(filename=FOLDER_PATH+"feature_transformer.joblib")

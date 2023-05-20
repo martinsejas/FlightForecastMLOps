@@ -6,6 +6,7 @@ import uvicorn
 from datetime import datetime
 from typing import List, Dict, Union
 from DatabaseConnection import DatabaseConnection
+from model.generate_predictions import get_predictions
 
 
 
@@ -93,8 +94,12 @@ async def make_predictions(received_my_features: Flights):
     flights_data = flights_dict['data']
     received_my_features_df = pd.json_normalize(flights_data)
     
+    prices = get_predictions(received_my_features_df.copy())
+    
+    print(f"prices type is: {type(prices)}, shape is {prices.shape} ")
+    
 
-    received_my_features_df["price"] = 42
+    received_my_features_df["price"] = pd.Series(prices.ravel())
     received_my_features_df["prediction_source"] = "Webapp"
     received_my_features_df["prediction_time"] = (datetime.now()).strftime(TIMESTAMP_FORMAT)
  
