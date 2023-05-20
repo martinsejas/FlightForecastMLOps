@@ -7,7 +7,8 @@ import json
 
 COLUMNS = ['airline', 'flight', 'source_city', 'departure_time', 'stops', 'arrival_time', 'destination_city', 'class_', 'duration', 'days_left']
 COLUMNS_csv = ['airline', 'flight', 'source_city', 'departure_time', 'stops', 'arrival_time', 'destination_city', 'class_', 'duration', 'days_left','price']
-
+PRINTING_COLUMNS = ['price','airline', 'flight', 'source_city', 'departure_time', 'stops', 'arrival_time',
+                    'destination_city', 'class_', 'duration', 'days_left','prediction_source', 'prediction_time']
 BASE_URL = "http://localhost:8000"
 
 PREDICTIONS_URL = BASE_URL + "/predict/"
@@ -32,7 +33,7 @@ def send_prediction_request(features: pd.DataFrame)-> pd.DataFrame:
         df_content= json.loads(response.content)
         
         response_df = pd.DataFrame(df_content)
-        response_df['price'] = 42
+        
         return response_df
     else:
         # if the request failed, print an error message and return None
@@ -110,9 +111,9 @@ if st.button(':ship: Get Prediction! :ship:', type='primary', use_container_widt
         data_numpy = data_numpy.reshape(1,-1)
         prediction_df = pd.DataFrame(data=data_numpy, columns=COLUMNS)
         actual_prediction = send_prediction_request(prediction_df)
-        
-        st.write("Your prediction is: 42")
-        st.dataframe(actual_prediction)
+        actual_prediction = actual_prediction[PRINTING_COLUMNS]
+        st.write(f"Your prediction is: {(actual_prediction['price'].values[0]):.2f} rupees")
+        st.write(actual_prediction.iloc[:, 0:])
         
     
 
@@ -135,7 +136,8 @@ if feature_csv and predict_many:
     df = pd.read_csv(feature_csv, names=COLUMNS_csv, header=None)
     df = df.drop(columns=['price'])
     predictions = send_prediction_request(df)
-    st.dataframe(predictions)
+    predictions = predictions[PRINTING_COLUMNS]
+    st.write(predictions.to_csv(index=False))
     
 else:
     st.caption("Please upload file before requesting predictions.")
