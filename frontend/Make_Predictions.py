@@ -20,7 +20,7 @@ def send_prediction_request(features: pd.DataFrame)-> pd.DataFrame:
     payload = features.to_dict(orient='records')
     print(payload)
     
-    payload= { "data": payload}
+    payload= { "data": payload, "source": "Webapp"}
     
     print(json.dumps(payload))
    

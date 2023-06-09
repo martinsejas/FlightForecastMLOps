@@ -78,6 +78,7 @@ class Flight(BaseModel):
 
 class Flights(BaseModel):
     data: List[Flight]
+    source: str
 
     class Config:
         orm_mode = True
@@ -100,7 +101,7 @@ async def make_predictions(received_my_features: Flights):
     
 
     received_my_features_df["price"] = pd.Series(prices.ravel())
-    received_my_features_df["prediction_source"] = "Webapp"
+    received_my_features_df["prediction_source"] = flights_dict['source']
     received_my_features_df["prediction_time"] = (datetime.now()).strftime(TIMESTAMP_FORMAT)
  
     
