@@ -3,18 +3,16 @@
     it also allows us to use a single object for the database connection.
 """
 
-from dotenv import load_dotenv
 import os
 import pyodbc
 
 
 class DatabaseConnection:
     def __init__(self) -> None:
-        load_dotenv()
-        server = os.getenv("HOST")
-        database = os.getenv("DATABASE")
-        username = os.getenv("DBUSERNAME")
-        password = os.getenv("PASSWORD")
+        server = "dsp-group3.database.windows.net"
+        database = "flight-prediction"
+        username = "ais-epita"
+        password = "DSPgroup3*"
         driver= '{ODBC Driver 18 for SQL Server}'
         self.connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}'
         self.connection = pyodbc.connect(self.connection_string)

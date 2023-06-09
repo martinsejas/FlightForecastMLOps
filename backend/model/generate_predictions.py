@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import joblib
 
-FOLDER_PATH = "backend/persisted_models/"
+FOLDER_PATH = "/mnt/c/Users/Martin/Documents/FlightPricePrediction/backend/persisted_models/"
 
 #Encoding
 def encode_stops(s:str)-> int:
@@ -34,7 +34,6 @@ def get_predictions(df: pd.DataFrame)-> np.array:
     #drop unnecessary columns
     df = df.drop(columns=['flight',"class_"])
     
-    print(df.head())
     
     # pre_processing raw data
     pre_processor = joblib.load(filename=FOLDER_PATH+"pre_processor_features.joblib")

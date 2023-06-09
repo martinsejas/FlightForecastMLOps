@@ -18,11 +18,11 @@ HEADERS = {'Content-type': 'application/json'}
 def send_prediction_request(features: pd.DataFrame)-> pd.DataFrame:
     #converting to dictionary
     payload = features.to_dict(orient='records')
-    print(payload)
+
     
     payload= { "data": payload, "source": "Webapp"}
     
-    print(json.dumps(payload))
+
    
     
     #Sending as a post request

@@ -90,14 +90,13 @@ class Flights(BaseModel):
 @app.post("/predict/")
 async def make_predictions(received_my_features: Flights):
     
-    
+
     flights_dict = received_my_features.dict()
     flights_data = flights_dict['data']
     received_my_features_df = pd.json_normalize(flights_data)
     
     prices = get_predictions(received_my_features_df.copy())
     
-    print(f"prices type is: {type(prices)}, shape is {prices.shape} ")
     
 
     received_my_features_df["price"] = pd.Series(prices.ravel())

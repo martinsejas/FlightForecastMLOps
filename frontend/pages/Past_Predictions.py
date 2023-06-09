@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
+from datetime import timedelta
 import requests
 import numpy as np
 
@@ -36,13 +37,16 @@ st.subheader( ' Want to see past trends? :chart_with_upwards_trend: ')
 st.markdown(' #### Select a date range, and prediction source and off you go! ')
 
 #Getting today's date to limit start date and end date options
-today = datetime.datetime.today()
+today = datetime.datetime.now() 
+
+tomorrow = today + timedelta(days=2)
+print(f"tomorrow is {tomorrow}")
 
 #Max is today's predictions
-start_date = st.date_input("Start date", datetime.date(2023,4,1), max_value=today)
+start_date = st.date_input("Start date", (datetime.date(2023,4,1)), max_value=tomorrow)
 
 #Has to be equal or bigger start date
-end_date = st.date_input("End date",today, min_value=start_date)
+end_date = st.date_input("End date",tomorrow, min_value=start_date)
 
 #Filtering by prediction_source
 prediction_source = st.selectbox('Prediction source', ('Webapp', 'Scheduled', 'All'))
