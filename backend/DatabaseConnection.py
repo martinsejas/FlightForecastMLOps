@@ -10,11 +10,13 @@ import pyodbc
 
 class DatabaseConnection:
     def __init__(self) -> None:
+
         load_dotenv()
         server = os.getenv("HOST")
         database = os.getenv("DATABASE")
         username = os.getenv("DBUSERNAME")
         password = os.getenv("PASSWORD")
+
         password = "DSPgroup3*"
         driver= '{ODBC Driver 18 for SQL Server}'
         self.connection_string = f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}'
