@@ -10,3 +10,5 @@ ipykernel==6.19.2
 fastapi==0.95.0
 uvicorn==0.21.1
 streamlit==1.21.0
+apache-airflow==2.6.1
+great-expectations==0.16.16
