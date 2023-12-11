@@ -1,5 +1,14 @@
 # FlightPricePrediction
-A repository to fulfill the AIS DSP Group Project. Composed of Martin Sejas, Younes Chaik, Marie Thérèse Feuijo
+
+An End to End Machile Learning Ops project. The Architecture can be found here:
+
+ ![image](https://github.com/martinsejas/FlightPricePrediction/assets/99181273/79546209-6548-4986-bb16-781dcbca8ccc)
+
+
+The Feature Store & Prediction Store was implemented in Azure using a PyODBC connector: 
+
+![image](https://github.com/martinsejas/FlightPricePrediction/assets/99181273/14b8de7b-e0ec-4545-92f6-d74b75c64536)
+
 
 You can find the dataset  [here.](https://www.kaggle.com/datasets/shubhambathwal/flight-price-prediction)
 
